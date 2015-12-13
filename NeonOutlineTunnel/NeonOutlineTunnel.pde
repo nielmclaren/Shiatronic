@@ -19,10 +19,10 @@ void setup() {
   reddish = 0xffb805c4;
 
   scales = new ArrayList<Float>();
-  scaleMultiplier = 1.03;
-  startScale = 0.1;
-  maxStartScale = 0.15;
-  maxScale = 6;
+  scaleMultiplier = 1.02;
+  startScale = 0.5;
+  maxStartScale = 0.62;
+  maxScale = 9;
 
   loadAndProcessImage(8);
 }
