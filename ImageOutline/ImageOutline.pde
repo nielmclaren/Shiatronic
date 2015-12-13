@@ -17,6 +17,14 @@ void draw() {
   image(output, 0, 0);
 }
 
+void loadAndProcessAllImages() {
+  for (int i = 0; i < numFrames; i++) {
+    int index = i + 1;
+    loadAndProcessImage(index);
+    output.save(savePath("data/out/" + getFilename(index)));
+  }
+}
+
 void loadAndProcessImage() {
   loadAndProcessImage(floor(random(1, 1541)));
 }
@@ -31,8 +39,6 @@ void loadAndProcessImage(int index) {
 }
 
 void processImage(PImage img) {
-  img.format = ARGB;
-
   img.loadPixels();
   for (int i = 0; i < img.pixels.length; i++) {
     img.pixels[i] = processPreBlurPixel(img.pixels[i]);
@@ -43,6 +49,9 @@ void processImage(PImage img) {
   for (int i = 0; i < img.pixels.length; i++) {
     img.pixels[i] = processPostBlurPixel(img.pixels[i]);
   }
+
+  blurrer.blur(img.pixels);
+
   img.updatePixels();
 }
 
@@ -57,7 +66,7 @@ color processPreBlurPixel(color c) {
 
 color processPostBlurPixel(color c) {
   if (c == 0xff000000 || c == 0xffffffff) {
-    return 0x00000000;
+    return 0xff000000;
   }
   else {
     return 0xffffffff;
@@ -72,6 +81,9 @@ void keyReleased() {
   switch (key) {
     case ' ':
       loadAndProcessImage();
+      break;
+    case 's':
+      loadAndProcessAllImages();
       break;
   }
 }
