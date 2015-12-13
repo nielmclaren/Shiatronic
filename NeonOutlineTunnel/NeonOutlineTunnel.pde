@@ -1,8 +1,14 @@
 
+int numFrames = 1540;
+
 color pink;
 color reddish;
 
-int numFrames = 1540;
+ArrayList<Float> scales;
+float scaleMultiplier;
+float startScale;
+float maxStartScale;
+float maxScale;
 
 PGraphics output;
 
@@ -12,26 +18,53 @@ void setup() {
   pink = 0xffcc5efc;
   reddish = 0xffb805c4;
 
+  scales = new ArrayList<Float>();
+  scaleMultiplier = 1.03;
+  startScale = 0.1;
+  maxStartScale = 0.15;
+  maxScale = 6;
+
   loadAndProcessImage(8);
 }
 
 void draw() {
-  background(64);
-  drawTunnel(g);
-}
+  updateScales();
 
-void drawTunnel(PGraphics g) {
+  background(64);
+
   g.pushMatrix();
   g.translate(width/2, height/2);
 
+  drawTunnel(g);
+
+  g.popMatrix();
+}
+
+void updateScales() {
+  for (int i = 0; i < scales.size(); i++) {
+    float scale = scales.get(i);
+    if (scale > maxScale) {
+      scales.remove(i);
+    }
+    else {
+      scales.set(i, scale * scaleMultiplier);
+    }
+  }
+
+  if (scales.size() < 1 || scales.get(0) > maxStartScale) {
+    scales.add(0, startScale);
+  }
+}
+
+void drawTunnel(PGraphics g) {
   g.pushStyle();
   g.blendMode(ADD);
 
-  println(mouseX);
-  int numTunnelSections = 15;
-  for (int i = 0; i < numTunnelSections; i++) {
+  for (int i = 0; i < scales.size(); i++) {
+    float scale = scales.get(i);
+
     g.pushMatrix();
-    g.scale(pow(2, map(i, 0, numTunnelSections, 0.001, 3)) - 1);
+    g.scale(scale);
     g.translate(mouseX - width/2, mouseY - height/2);
 
     drawTunnelSection(g);
@@ -40,7 +73,6 @@ void drawTunnel(PGraphics g) {
   }
 
   g.popStyle();
-  g.popMatrix();
 }
 
 void drawTunnelSection(PGraphics g) {
@@ -82,3 +114,6 @@ void keyReleased() {
   }
 }
 
+void mouseReleased() {
+  println(mouseX + ", " + mouseY);
+}
