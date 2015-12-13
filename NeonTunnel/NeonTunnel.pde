@@ -29,7 +29,28 @@ void drawBackground(PGraphics g) {
   g.background(0);
 }
 
-void drawTunnel(PGraphics canvas) {
+void drawTunnel(PGraphics g) {
+  g.pushMatrix();
+  g.translate(width/2, height/2);
+
+  g.pushStyle();
+  g.blendMode(ADD);
+
+  int numTunnelSections = 15;
+  for (int i = 0; i < numTunnelSections; i++) {
+    g.pushMatrix();
+    g.scale(pow(2, map(i, 0, numTunnelSections, 0.001, 2)) - 1);
+
+    drawTunnelSection(g);
+
+    g.popMatrix();
+  }
+
+  g.popStyle();
+  g.popMatrix();
+}
+
+void drawTunnelSection(PGraphics canvas) {
   PGraphics g = createGraphics(canvas.width, canvas.height, P2D);
 
   g.pushStyle();
@@ -40,7 +61,7 @@ void drawTunnel(PGraphics canvas) {
   g.background(0);
 
   g.noFill();
-  g.strokeWeight(15);
+  g.strokeWeight(8);
 
   g.stroke(pink);
   drawTunnelShape(g);
@@ -52,12 +73,12 @@ void drawTunnel(PGraphics canvas) {
 
   blur(g, blur5);
 
-  g.strokeWeight(8);
+  g.strokeWeight(4);
 
   g.stroke(reddish);
   drawTunnelShape(g);
 
-  g.translate(-4, 2);
+  g.translate(-2, 0.5);
 
   g.stroke(pink);
   drawTunnelShape(g);
@@ -67,15 +88,18 @@ void drawTunnel(PGraphics canvas) {
   g.popMatrix();
   g.popStyle();
 
+  canvas.pushStyle();
+  canvas.imageMode(CENTER);
   canvas.image(g, 0, 0);
+  canvas.popStyle();
 }
 
 void drawTunnelShape(PGraphics g) {
   g.quad(
-    0.3 * width, 0.2 * height,
-    0.7 * width, 0.2 * height,
-    0.8 * width, 0.8 * height,
-    0.2 * width, 0.8 * height);
+    0.3 * g.width, 0.2 * g.height,
+    0.7 * g.width, 0.2 * g.height,
+    0.8 * g.width, 0.8 * g.height,
+    0.2 * g.width, 0.8 * g.height);
 }
 
 void blur(PGraphics g, FastBlurrer blurrer) {
