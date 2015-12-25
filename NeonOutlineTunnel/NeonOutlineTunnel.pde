@@ -15,6 +15,9 @@ int frameUpdated;
 int currFrame;
 
 ArrayList<PImage> frames;
+ArrayList<PImage> outlines;
+
+boolean isPaused;
 
 void setup() {
   size(1280, 720, P2D);
@@ -23,19 +26,23 @@ void setup() {
   reddish = 0xffb805c4;
 
   tunnelSections = new ArrayList<TunnelSection>();
-  scaleMultiplier = 1.02;
-  startScale = 0.1;
-  maxStartScale = 0.15;
-  maxScale = 9;
+  scaleMultiplier = 1.03;
+  startScale = 0.5;
+  maxStartScale = 0.62;
+  maxScale = 12;
 
   frameDuration = 100;
   frameUpdated = millis();
   currFrame = 0;
 
   frames = new ArrayList<PImage>();
+  outlines = new ArrayList<PImage>();
   for (int i = 0; i < numFrames; i++) {
-    frames.add(loadAndProcessImage(i));
+    frames.add(loadAndProcessFrame(i));
+    outlines.add(loadAndProcessOutline(i));
   }
+
+  isPaused = false;
 }
 
 void draw() {
@@ -45,12 +52,33 @@ void draw() {
 
   background(64);
 
+  drawOutline(g);
+  drawFrame(g);
+}
+
+void drawOutline(PGraphics g) {
   g.pushMatrix();
   g.translate(width/2, height/2);
 
   drawTunnel(g);
 
   g.popMatrix();
+}
+
+void drawFrame(PGraphics g) {
+  g.pushStyle();
+  g.pushMatrix();
+
+  g.translate(width/2, height/2);
+  g.scale(0.5);
+
+  g.imageMode(CENTER);
+
+  PImage frame = frames.get(currFrame);
+  g.image(frame, 0, 0);
+
+  g.popMatrix();
+  g.popStyle();
 }
 
 void updateScales() {
@@ -83,7 +111,6 @@ void drawTunnel(PGraphics g) {
 
     g.pushMatrix();
     g.scale(scale);
-    g.translate(mouseX - width/2, mouseY - height/2);
 
     drawTunnelSection(g, ts);
 
@@ -94,7 +121,7 @@ void drawTunnel(PGraphics g) {
 }
 
 void drawTunnelSection(PGraphics g, TunnelSection ts) {
-  PImage frame = frames.get(ts.frame());
+  PImage outline = outlines.get(ts.frame());
 
   g.pushStyle();
   g.pushMatrix();
@@ -102,10 +129,10 @@ void drawTunnelSection(PGraphics g, TunnelSection ts) {
   g.imageMode(CENTER);
 
   g.tint(pink);
-  g.image(frame, 0, 0);
+  g.image(outline, 0, 0);
 
   g.tint(reddish);
-  g.image(frame, -2, 0.5);
+  g.image(outline, -2, 0.5);
 
   g.popMatrix();
   g.popStyle();
@@ -113,6 +140,12 @@ void drawTunnelSection(PGraphics g, TunnelSection ts) {
 
 void updateFrame() {
   int now = millis();
+
+  if (isPaused) {
+    frameUpdated = now;
+    return;
+  }
+
   int delta = now - frameUpdated;
   currFrame += floor(delta / frameDuration);
   frameUpdated = now - delta % frameDuration;
@@ -121,8 +154,12 @@ void updateFrame() {
   }
 }
 
-PImage loadAndProcessImage(int index) {
-  return loadImage("in/" + getFilename(index));
+PImage loadAndProcessFrame(int index) {
+  return loadImage("frames/" + getFilename(index));
+}
+
+PImage loadAndProcessOutline(int index) {
+  return loadImage("outlines/" + getFilename(index));
 }
 
 String getFilename(int index) {
@@ -131,6 +168,9 @@ String getFilename(int index) {
 
 void keyReleased() {
   switch (key) {
+    case ' ':
+      isPaused = !isPaused;
+      break;
   }
 }
 
