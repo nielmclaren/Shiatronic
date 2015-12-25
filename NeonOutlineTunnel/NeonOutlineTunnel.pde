@@ -1,16 +1,20 @@
 
-int numFrames = 1540;
+int numFrames = 100;
 
 color pink;
 color reddish;
 
-ArrayList<Float> scales;
+ArrayList<TunnelSection> tunnelSections;
 float scaleMultiplier;
 float startScale;
 float maxStartScale;
 float maxScale;
 
-PGraphics output;
+int frameDuration;
+int frameUpdated;
+int currFrame;
+
+ArrayList<PImage> frames;
 
 void setup() {
   size(1280, 720, P2D);
@@ -18,16 +22,25 @@ void setup() {
   pink = 0xffcc5efc;
   reddish = 0xffb805c4;
 
-  scales = new ArrayList<Float>();
+  tunnelSections = new ArrayList<TunnelSection>();
   scaleMultiplier = 1.02;
-  startScale = 0.5;
-  maxStartScale = 0.62;
+  startScale = 0.1;
+  maxStartScale = 0.15;
   maxScale = 9;
 
-  loadAndProcessImage(8);
+  frameDuration = 100;
+  frameUpdated = millis();
+  currFrame = 0;
+
+  frames = new ArrayList<PImage>();
+  for (int i = 0; i < numFrames; i++) {
+    frames.add(loadAndProcessImage(i));
+  }
 }
 
 void draw() {
+  updateFrame();
+
   updateScales();
 
   background(64);
@@ -41,18 +54,22 @@ void draw() {
 }
 
 void updateScales() {
-  for (int i = 0; i < scales.size(); i++) {
-    float scale = scales.get(i);
+  for (int i = 0; i < tunnelSections.size(); i++) {
+    TunnelSection ts = tunnelSections.get(i);
+    float scale = ts.scale();
     if (scale > maxScale) {
-      scales.remove(i);
+      tunnelSections.remove(i);
     }
     else {
-      scales.set(i, scale * scaleMultiplier);
+      ts.scale(scale * scaleMultiplier);
     }
   }
 
-  if (scales.size() < 1 || scales.get(0) > maxStartScale) {
-    scales.add(0, startScale);
+  if (tunnelSections.size() < 1 || tunnelSections.get(0).scale > maxStartScale) {
+    TunnelSection ts = (new TunnelSection())
+      .scale(startScale)
+      .frame(currFrame);
+    tunnelSections.add(0, ts);
   }
 }
 
@@ -60,14 +77,15 @@ void drawTunnel(PGraphics g) {
   g.pushStyle();
   g.blendMode(ADD);
 
-  for (int i = 0; i < scales.size(); i++) {
-    float scale = scales.get(i);
+  for (int i = 0; i < tunnelSections.size(); i++) {
+    TunnelSection ts = tunnelSections.get(i);
+    float scale = ts.scale();
 
     g.pushMatrix();
     g.scale(scale);
     g.translate(mouseX - width/2, mouseY - height/2);
 
-    drawTunnelSection(g);
+    drawTunnelSection(g, ts);
 
     g.popMatrix();
   }
@@ -75,34 +93,36 @@ void drawTunnel(PGraphics g) {
   g.popStyle();
 }
 
-void drawTunnelSection(PGraphics g) {
+void drawTunnelSection(PGraphics g, TunnelSection ts) {
+  PImage frame = frames.get(ts.frame());
+
   g.pushStyle();
   g.pushMatrix();
 
   g.imageMode(CENTER);
 
   g.tint(pink);
-  g.image(output, 0, 0);
+  g.image(frame, 0, 0);
 
   g.tint(reddish);
-  g.image(output, -2, 0.5);
-
+  g.image(frame, -2, 0.5);
 
   g.popMatrix();
   g.popStyle();
 }
 
-void loadAndProcessImage() {
-  loadAndProcessImage(floor(random(1, 1541)));
+void updateFrame() {
+  int now = millis();
+  int delta = now - frameUpdated;
+  currFrame += floor(delta / frameDuration);
+  frameUpdated = now - delta % frameDuration;
+  while (currFrame >= numFrames) {
+    currFrame -= numFrames;
+  }
 }
 
-void loadAndProcessImage(int index) {
-  PImage outline = loadImage("in/" + getFilename(index));
-
-  output = createGraphics(outline.width, outline.height, P2D);
-  output.beginDraw();
-  output.image(outline, 0, 0);
-  output.endDraw();
+PImage loadAndProcessImage(int index) {
+  return loadImage("in/" + getFilename(index));
 }
 
 String getFilename(int index) {
