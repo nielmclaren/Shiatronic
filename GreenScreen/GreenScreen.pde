@@ -27,21 +27,22 @@ void loadAndProcessImage() {
 
 void loadAndProcessImage(int index) {
   input = loadImage("in/" + getFilename(index));
-  output = input.get();
-  processPixels(output);
+  output = createGraphics(input.width, input.height, P2D);
+  processPixels(input, output);
 }
 
-void processPixels(PImage img) {
-  img.loadPixels();
-  for (int i = 0; i < img.pixels.length; i++) {
-    img.pixels[i] = processPixel(img.pixels[i]);
+void processPixels(PImage input, PImage output) {
+  input.loadPixels();
+  output.loadPixels();
+  for (int i = 0; i < input.pixels.length; i++) {
+    output.pixels[i] = processPixel(input.pixels[i]);
   }
-  img.updatePixels();
+  output.updatePixels();
 }
 
 color processPixel(color c) {
   if (red(c) < 160 && green(c) > 136 && blue(c) < 192) {
-    return color(0, 255, 0);
+    return color(0, 0);
   }
   else {
     return c;
