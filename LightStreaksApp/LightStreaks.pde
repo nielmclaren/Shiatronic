@@ -2,9 +2,6 @@
 import java.util.Iterator;
 
 class LightStreaks {
-  private final color pink = 0xffcc5efc;
-  private final color reddish = 0xffb805c4;
-
   private int width;
   private int height;
 
@@ -18,6 +15,10 @@ class LightStreaks {
   private float streakStartZ;
   private float streakEndZ;
 
+  private Palette palette;
+
+  private FastBlurrer blurrer;
+
   LightStreaks(int w, int h) {
     width = w;
     height = h;
@@ -25,12 +26,16 @@ class LightStreaks {
     streaks = new ArrayList<LightStreak>();
     canvas = createGraphics(w, h, P3D);
 
-    minStreaks = 10;
-    maxStreaks = 20;
-    streakProbability = 0.05;
-    velocity = 4;
+    minStreaks = 20;
+    maxStreaks = 50;
+    streakProbability = 0.5;
+    velocity = 25;
     streakStartZ = -1000;
     streakEndZ = 500;
+
+    palette = createPalette();
+
+    blurrer = new FastBlurrer(width, height, 2);
 
     initStreaks();
   }
@@ -43,9 +48,7 @@ class LightStreaks {
     canvas.pushStyle();
 
     canvas.background(0);
-
-    canvas.noFill();
-    canvas.strokeWeight(8);
+    canvas.blendMode(ADD);
 
     drawStreaks(canvas);
 
@@ -53,7 +56,19 @@ class LightStreaks {
     canvas.popMatrix();
     canvas.endDraw();
 
+    canvas.loadPixels();
+    blurrer.blur(canvas.pixels, 3);
+    canvas.updatePixels();
+
     g.image(canvas, 0, 0);
+  }
+
+  private Palette createPalette() {
+    Palette p = new Palette();
+    p.add(0xffcc5efc, 2);
+    p.add(0xffb805c4, 2);
+    p.add(0xff8d0c4d);
+    return p;
   }
 
   private void initStreaks() {
@@ -72,7 +87,6 @@ class LightStreaks {
       step(streak);
 
       if (!isVisible(streak)) {
-        println("Remove streak");
         streaks.remove(i);
         i--;
       }
@@ -96,13 +110,13 @@ class LightStreaks {
       z = streakStartZ - streakLength;
     }
 
+    color c = palette.random();
+
     PVector startPoint = new PVector(random(minRadius, maxRadius), 0, z);
     startPoint.rotate(random(2 * PI));
     startPoint.add(width/2, height/2, 0);
 
-    println("Create streak", startPoint, streakLength);
-
-    return new LightStreak(startPoint, streakLength);
+    return new LightStreak(startPoint, streakLength, c);
   }
 
   private boolean isVisible(LightStreak streak) {
@@ -124,10 +138,12 @@ class LightStreaks {
   private class LightStreak {
     private PVector point;
     private float length;
+    private color strokeColor;
 
-    LightStreak(PVector p, float len) {
+    LightStreak(PVector p, float len, color c) {
       point = p;
       length = len;
+      strokeColor = c;
     }
 
     float z() {
@@ -144,13 +160,29 @@ class LightStreaks {
       g.pushStyle();
 
       g.noFill();
-      g.stroke(0xffff0000);
-      g.strokeWeight(6);
+      g.stroke(strokeColor);
+      g.strokeWeight(2);
 
-      g.line(point.x, point.y, point.z, point.x, point.y, point.z + length);
+      drawLine(g, -1, 0);
+      drawLine(g, 1, 0);
+      drawLine(g, 0, -1);
+      drawLine(g, 0, 1);
+
+      drawLine(g, 0, 0);
 
       g.popStyle();
       g.endDraw();
+    }
+
+    private void drawLine(PGraphics g, float xOffset, float yOffset) {
+      float offset = 1;
+      g.line(
+          point.x + xOffset * offset,
+          point.y + yOffset * offset,
+          point.z,
+          point.x + xOffset * offset,
+          point.y + yOffset * offset,
+          point.z + length);
     }
   }
 }

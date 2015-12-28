@@ -33,6 +33,12 @@ class FastBlurrer {
     dv = new int[256*div];
   }
 
+  void blur(color[] pixels, int n) {
+    for (int i = 0; i < n; i++) {
+      blur(pixels);
+    }
+  }
+
   /**
    * Thanks Mario!
    * @see http://incubator.quasimondo.com/processing/superfastblur.pde
