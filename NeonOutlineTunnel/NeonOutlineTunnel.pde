@@ -171,6 +171,9 @@ void keyReleased() {
     case ' ':
       isPaused = !isPaused;
       break;
+    case 'r':
+      saveFrame("../render.png");
+      break;
   }
 }
 
