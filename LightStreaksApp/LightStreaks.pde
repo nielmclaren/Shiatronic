@@ -44,7 +44,6 @@ class LightStreaks {
     updateStreaks();
 
     canvas.beginDraw();
-    canvas.pushMatrix();
     canvas.pushStyle();
 
     canvas.background(0);
@@ -53,7 +52,6 @@ class LightStreaks {
     drawStreaks(canvas);
 
     canvas.popStyle();
-    canvas.popMatrix();
     canvas.endDraw();
 
     canvas.loadPixels();
@@ -98,7 +96,7 @@ class LightStreaks {
   }
 
   private LightStreak createStreak(boolean isInit) {
-    float streakLength = random(50, 500);
+    float streakLength = random(100, 1000);
 
     float minRadius = 0.2 * min(width, height);
     float maxRadius = 0.6 * max(width, height);
@@ -156,7 +154,6 @@ class LightStreaks {
     }
 
     void draw(PGraphics g) {
-      g.beginDraw();
       g.pushStyle();
 
       g.noFill();
@@ -171,7 +168,6 @@ class LightStreaks {
       drawLine(g, 0, 0);
 
       g.popStyle();
-      g.endDraw();
     }
 
     private void drawLine(PGraphics g, float xOffset, float yOffset) {
