@@ -99,8 +99,6 @@ class ShiaTunnel {
     PImage outline = outlines.get(ts.frame());
 
     g.pushStyle();
-    g.pushMatrix();
-
     g.imageMode(CENTER);
 
     g.tint(pink);
@@ -109,7 +107,6 @@ class ShiaTunnel {
     g.tint(reddish);
     g.image(outline, -2, 0.5);
 
-    g.popMatrix();
     g.popStyle();
   }
 
