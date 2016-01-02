@@ -16,8 +16,8 @@ class ShiaTunnel {
   ShiaTunnel(int startFrame, int numFrames) {
     tunnelSections = new ArrayList<TunnelSection>();
     scaleMultiplier = 1.03;
-    startScale = 0.5;
-    maxStartScale = 0.62;
+    startScale = 1;
+    maxStartScale = 1.12;
     maxScale = 12;
 
     println("Loading outlines...");
@@ -111,7 +111,7 @@ class ShiaTunnel {
   }
 
   PImage loadOutline(int index) {
-    return loadImage("outlines/" + getFilename(index));
+    return loadImage("outlines270/" + getFilename(index));
   }
 
   String getFilename(int index) {

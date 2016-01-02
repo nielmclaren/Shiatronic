@@ -17,7 +17,6 @@ class ShiaClip {
     g.pushMatrix();
 
     g.translate(width/2, height/2);
-    g.scale(0.5);
 
     g.imageMode(CENTER);
 
@@ -30,7 +29,7 @@ class ShiaClip {
   }
 
   PImage loadFrame(int index) {
-    return loadImage("frames/" + getFilename(index));
+    return loadImage("frames270/" + getFilename(index));
   }
 
   String getFilename(int index) {

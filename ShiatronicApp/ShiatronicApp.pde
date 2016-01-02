@@ -6,10 +6,11 @@ PImage background;
 LightStreaks streaks;
 ShiaClip clip;
 ShiaTunnel tunnel;
+PFont subtitleFont;
 FileNamer fileNamer;
 
 void setup() {
-  size(1280, 720, P2D);
+  size(480, 270, P2D);
 
   startFrame = 60;
   numFrames = 40;
@@ -18,6 +19,7 @@ void setup() {
   streaks = new LightStreaks(width, height);
   clip = new ShiaClip(startFrame, numFrames);
   tunnel = new ShiaTunnel(startFrame, numFrames);
+  subtitleFont = createFont("Xolonium", 20);
   fileNamer = new FileNamer("output/export", "png");
 }
 
@@ -35,6 +37,29 @@ void drawBackground(PGraphics g) {
   g.beginDraw();
   g.image(background, 0, 0, background.width * scale, background.height * scale);
   g.endDraw();
+}
+
+void drawSubtitle(PGraphics g) {
+  g.beginDraw();
+  g.pushStyle();
+  g.textFont(subtitleFont);
+  g.textAlign(CENTER, CENTER);
+  drawText(g, "Don't let your dreams be dreams.", 0.5 * width, 0.90 * height);
+  g.popStyle();
+  g.endDraw();
+}
+
+void drawText(PGraphics g, String text, float x, float y) {
+  float offset = 1;
+  g.fill(0);
+
+  g.text(text, x + offset, y + offset);
+  g.text(text, x - offset, y + offset);
+  g.text(text, x + offset, y - offset);
+  g.text(text, x - offset, y - offset);
+
+  g.fill(255);
+  g.text(text, x, y);
 }
 
 void keyReleased() {
