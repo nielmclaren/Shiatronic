@@ -1,5 +1,6 @@
 
-Playback playback;
+int startFrame;
+int numFrames;
 
 PImage background;
 LightStreaks streaks;
@@ -10,10 +11,8 @@ FileNamer fileNamer;
 void setup() {
   size(1280, 720, P2D);
 
-  int startFrame = 60;
-  int numFrames = 40;
-
-  playback = new Playback(numFrames);
+  startFrame = 60;
+  numFrames = 40;
 
   background = loadImage("starfield.jpg");
   streaks = new LightStreaks(width, height);
@@ -23,12 +22,12 @@ void setup() {
 }
 
 void draw() {
-  playback.update();
+  int currFrame = frameCount / 3 % numFrames;
 
   drawBackground(g);
   streaks.draw(g);
-  tunnel.draw(g, playback.frame());
-  clip.draw(g, playback.frame());
+  tunnel.draw(g, currFrame);
+  clip.draw(g, currFrame);
 }
 
 void drawBackground(PGraphics g) {
@@ -40,11 +39,6 @@ void drawBackground(PGraphics g) {
 
 void keyReleased() {
   switch (key) {
-    case ' ':
-      boolean isPaused = !playback.isPaused();
-      playback.isPaused(isPaused);
-      tunnel.isPaused(isPaused);
-      break;
     case 'r':
       save(fileNamer.next());
       break;
