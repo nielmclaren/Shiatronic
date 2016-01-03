@@ -10,9 +10,10 @@ PFont subtitleFont;
 FileNamer fileNamer;
 
 void setup() {
-  size(480, 270, P2D);
+  size(270, 270, P2D);
 
-  startFrame = 60;
+  // 70, 60; 130, 50; 198, 60; 370, 65; 444, 50; 649, 50; 1012, 80; 1092, 40;
+  startFrame = 1092;
   numFrames = 40;
 
   background = loadImage("starfield.jpg");
@@ -24,12 +25,16 @@ void setup() {
 }
 
 void draw() {
-  int currFrame = frameCount / 3 % numFrames;
+  int currFrame = frameCount / 2 % numFrames;
+  drawFrame(g, currFrame);
+}
 
+void drawFrame(PGraphics g, int frame) {
   drawBackground(g);
   streaks.draw(g);
-  tunnel.draw(g, currFrame);
-  clip.draw(g, currFrame);
+  tunnel.draw(g, frame);
+  clip.draw(g, frame);
+  drawSubtitle(g);
 }
 
 void drawBackground(PGraphics g) {
@@ -44,7 +49,7 @@ void drawSubtitle(PGraphics g) {
   g.pushStyle();
   g.textFont(subtitleFont);
   g.textAlign(CENTER, CENTER);
-  drawText(g, "Don't let your dreams be dreams.", 0.5 * width, 0.90 * height);
+  drawText(g, "Yes you can!", 0.5 * width, 0.90 * height);
   g.popStyle();
   g.endDraw();
 }
@@ -62,11 +67,22 @@ void drawText(PGraphics g, String text, float x, float y) {
   g.text(text, x, y);
 }
 
+void saveFrames() {
+  PGraphics g = createGraphics(width, height, P3D);
+  FileNamer fileNamer = new FileNamer("output09/frame", "gif");
+  for (int i = 0; i < numFrames * 2; i++) {
+    drawFrame(g, floor(i/2));
+    g.save(fileNamer.next());
+  }
+}
+
 void keyReleased() {
   switch (key) {
     case 'r':
       save(fileNamer.next());
       break;
+    case 's':
+      saveFrames();
+      break;
   }
 }
-

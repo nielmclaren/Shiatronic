@@ -18,7 +18,7 @@ class ShiaTunnel {
     scaleMultiplier = 1.03;
     startScale = 1;
     maxStartScale = 1.12;
-    maxScale = 12;
+    maxScale = 20;
 
     println("Loading outlines...");
     outlines = new ArrayList<PImage>();
